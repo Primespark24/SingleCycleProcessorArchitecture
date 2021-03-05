@@ -201,9 +201,8 @@ Start the Vivado simulator test bench then proceed as follows:
    
 ![Adding other signals to signal trace window](./img/trace_instructions.png)
 
-# -------------------------------------------------
 
-# Exercise 3-1: Changing the Machine Code Program and Predicting Control Signals
+# MIPS_3-1 - Change MIPS Program (Individual) 
 
 ### Steps to Change the Machine Code for MIPS 3 
 1. Create a machine code file and add the following machine code to it. I recommed using .dat as the extension. Do not leave any empty lines in the file!
@@ -228,180 +227,171 @@ Start the Vivado simulator test bench then proceed as follows:
     ac470047
     ```
 2. Modify ```mips_mem_instructions.vhd``` to load ```memfile_2.dat``` rather than ```memfile.dat```.
+3. Here is a copy of the MIPS instructions that were assembled to machine code for ```memfile_2.dat```:
+    ```mips
+    #
+    # Test MIPS instructions mipstest_2.asm
+    # Assembly Code             # Machine Code
+    main:	addi $2, $0, 5	    # 20020005
+            addi $7, $0, 3	    # 20070003
+            addi $3, $0, 0xc    # 2003000c
+            or   $4, $7, $2     # 00e22025
+            and  $5, $3, $4     # 00642824
+            add  $5, $5, $4     # 00a42820
+            beq  $5, $7, end    # 10a70008
+            slt  $6, $3, $4     # 0064302a
+            beq  $6, $0, around # 10c00001
+            addi $5, $0, 10     # 2005000a
+    around: slt  $6, $7, $2     # 00e2302a
+            add  $7, $6, $5     # 00c53820
+            sub  $7, $7, $2     # 00e23822
+            j    end            # 0800000f
+            lw   $7, 0($0)      # 8c070000
+    end:    sw   $7, 71($2)     # ac470047
+
+    ```
+4. Run ```gen.sh`` to re-generate the simulation and bitstream. 
+5. BEFORE running the simulation OR running the hardware vivado program,complete the following prediction task. 
+   
+In a complex system, if you don’t know what answer the system should produce, you won’t be able to debug the system. 
+Begin by predicting what will happen for each instruction when running the program.  This means that you should follow any 
+branches or jumps in your prediction! 
+
+Here are some hints to help you. You will still need to study the architecture diagram and VHDL code to trace what is happening. 
+* ```branch``` is asserted (1) when the instruction is a ```branch (beq)``` instruction. 
+*  ```aluout``` is the output of the ALU at each cycle.  
+* ```zero``` is high (1) only if ```aluout``` is 0.  
+* ```pcsrc```, a signal in the datapath, is low (0) when the next value of the program counter ```nextpc``` should be the next instruction ```pc+4```.  
+* ```pcsrc``` is high (1) when the ```nextpc``` should be set to the branch target address ```pcbranch```.
+
+You will notice that all of these signals are not available from the top-level entity (mips).  For checking your answeers by simulation, 
+you will need to drill down and look at these signals (and possibly others) and drag them to the simulation trace window in vivado.
+
+
+### Complete the following 12 rows of the table and predict each of the following signals (look at the VHDL code and mips schematic to predict the program signals)
+
+NOTE: Do NOT Correct this table after you make the predictions. You will have a chance to make the correct table later in this document.
+   
+
+| TIME | RESET | PCSRC | PC       | BRANCH | INSTR    | SRCA     | SRCB     | ALUOUT   | ZERO | WRITEDATA | MEMWRITE | READDATA |
+| ---- | ----- | ----- | -------- | ------ | -------- | -------- | -------- | -------- | -----| --------- | -------- | -------- |
+|  0 ns| 1     | 0     | 00000000 | 0      | 20020005 | 00000000 | 00000005 | 00000005 | 0    | UUUUUUUU  | 0        | UUUUUUUU |
+| 20 ns| 1     | 0     | 00000000 | 0      | 20020005 | 00000000 | 00000005 | 00000005 | 0    | 00000005  | 0        | UUUUUUUU |
+| 40 ns| 0     | 0     | 00000004 | 0      | 20070003 | 00000000 | 00000003 | 00000003 | 0    | UUUUUUUU  | 0        | UUUUUUUU |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|300 ns| 0     | 0     | 00000040 | 0      | 00000000 | 00000000 | 00000000 | 00000000 | 1    | 00000007  | 0        | UUUUUUUU |
+
+
+# MIPS_3-2 - Compare Sim to Prediction (Individual)
+
+Now, you will run the program in simulation and record the actual control signal values. You will compare your predictions to what actually happens. 
+When running the simulation, you will not be able to see the resulting value in a destination register until the clock cycle AFTER the instruction has run! For example:
+    ```
+    Assume $4 has 3 in it. 
+    Assume $5 has 4 in it.
+    Assume that the microprocessor is currently running the instruction ```add $6, $5, $4``` 
+    Then, on the signal trace you won't be able to see that $6 has 7 in it until the clock cycle immediately following the instruction.
+    ```
+
+A help in understanding what is going on is that you can drag any signal you want to see to the signal trace window. For example, you could, if you want 
+drag the register memory location 4 to the signal trace and watch it change during the simulation run.
+
+
+### Exercise MIPS_3-2 Steps. Read these carefully!
+
+For debugging, you will need to make other signals from sub-components visible in the trace window of the ISIM simulator.  To do this, expand the testbench entity in the Instance and Process Name window by clicking on the triangle beside it.  Now, expand the dut (device under test) entity, followed by the mips1 entity, followed by the cont (controller) entity.  Within the cont entity you will see the ad (alu decoder) entity and the md (main decoder) entity.  Click and drag the md (main decoder) entity to the waveform window. Also click and drag the ad (alu decoder) entity to the waveform window as well.  
+
+Now that you have the controller entity signals on the waveform window, you will need to restart the simulation to update the waveform.  Run the simulation in 20ns steps. Make sure your signals are appearing correctly.
+
+* You can remove signals from the waveform window by right-clicking on them.  
+* You can also change how signals are displayed on the waveform window by right-clicking and selecting a hexadecimal radix.
+* You can change the order of the signals on the waveform by dragging them to a new position. 
+
+For this assignment must have the exact signals in the order described below. 
+
+1. Setup the Waveform Trace with the Required Signals for Exercise MIPS3_2. To do this, add the following signals in this exact order:  
+   ```
+   clk,  reset, pcsrc,  pc,  branch, instr, srca, srcb,  aluout,  zero, writedata,  memwrite, readdata
+   ```
+
+2. Screen Snip the Waveform Trace Displays:
+For multi-bit signal values, make sure the signal trace shows these as hexadecimal values. They must also be readable to be awarded full credit! 
+
+A.	Screen snip and insert a waveform trace from  0 ns to 60 ns here:
+
+B.	Screen snip and insert a waveform trace from  60 ns to 120 ns here:
+
+C.	Screen snip and insert a waveform trace from 120 ns to 180 ns here:
+
+D.	Screen snip and insert a waveform trace from 180 ns to 240 ns here:
+
+E.	Screen snip and insert a waveform trace from 240 ns to 300 ns here:
+
+3.  Use the signals from the screen snips (or from the simulator) to complete the follow table 
+   
+| TIME | RESET | PCSRC | PC       | BRANCH | INSTR    | SRCA     | SRCB     | ALUOUT   | ZERO | WRITEDATA | MEMWRITE | READDATA |
+| ---- | ----- | ----- | -------- | ------ | -------- | -------- | -------- | -------- | -----| --------- | -------- | -------- |
+|  0 ns| 1     | 0     | 00000000 | 0      | 20020005 | 00000000 | 00000005 | 00000005 | 0    | UUUUUUUU  | 0        | UUUUUUUU |
+| 20 ns| 1     | 0     | 00000000 | 0      | 20020005 | 00000000 | 00000005 | 00000005 | 0    | 00000005  | 0        | UUUUUUUU |
+| 40 ns| 0     | 0     | 00000004 | 0      | 20070003 | 00000000 | 00000003 | 00000003 | 0    | UUUUUUUU  | 0        | UUUUUUUU |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|      |       |       |          |        |          |          |          |          |      |           |          |          |
+|300 ns| 0     | 0     | 00000040 | 0      | 00000000 | 00000000 | 00000000 | 00000000 | 1    | 00000007  | 0        | UUUUUUUU |
+
+
+### Discussion of Prediction vs Simulation
 
 ```
-Look at the assembly language instruction keyword.
 
-Identify the instruction (e.g. addi, sll, sw etc...)
-
-Look up the associated code for the instruction in the appendix, is it J, R or I type?
-
-Find the associated format. 
-
-Fill out each field of the format based on the arguments to the instruction.
-```
-Given the following MIPS assembler program, translate each of the given instructions to MIPS machine code in the areas provided. The first one is done for you as an example. Enter your values directly in the tables below.
-
-```mips
- addi $s0, $0, 22    	# $s0 = 0 + 22 = 22
- addi $s1, $s0, 20    	# $s1 = $s0 + 20 = 42
- sll  $s1, $s1, 2       # $s1 = $s1 << 2
- sw   $s1, 0x10($t2)    # store contents of $s1 to (0x10+$t2)
-```
-
-### The first instruction has been assembled for you as follows:
-
-```mips
-addi $s0, $0, 22    	# $s0 = 0 + 22 = 22
-```
-
-|               | OP    | RS     | RT    | IMM                 |
-|---------------|-------|--------|-------|---------------------|
-| Field Values  |(8)    | 0      | 16    | 22                  |
-| Machine Code  |001000 | 00000  | 10000 | 0000 0000 0001 0110 |
-| Size of Field |6 bits	| 5 bits | 5 bits| 16 bits             |
-<br>
-### 2-1.1 Assemble the following instruction, put your answers in the table below:
-
-```mips
-addi $s1, $s0, 20    	# $s1 = $s0 + 20 = 42
-```
-
-|               | OP    | RS     | RT    | IMM                 |
-|---------------|-------|--------|-------|---------------------|
-| Field Values  |       |        |       |                     |
-| Machine Code  |       |        |       |                     |
-| Size of Field |6 bits	| 5 bits | 5 bits| 16 bits             |
-<br>
-### 2-1.2 Assemble the following instruction, put your answers in the table below:
-
-```mips
-sll  $s1, $s1, 2       # $s1 = $s1 << 2
-```
-
-|               | OP    | RS     | RT    | IMM                 |
-|---------------|-------|--------|-------|---------------------|
-| Field Values  |       |        |       |                     |
-| Machine Code  |       |        |       |                     |
-| Size of Field |6 bits	| 5 bits | 5 bits| 16 bits             |
-
-<br>
-### 2-1.3 Assemble the following instruction, put your answers in the table below:
-
-```mips
-sw   $s1, 0x10($t2)    # store contents of $s1 to (0x10+$t2)
-```
-
-|               | OP    | RS     | RT    | IMM                 |
-|---------------|-------|--------|-------|---------------------|
-| Field Values  |       |        |       |                     |
-| Machine Code  |       |        |       |                     |
-| Size of Field |6 bits	| 5 bits | 5 bits| 16 bits             |
-
-
-# Exercise 2-2: Little/Big Endian  
-<br>
-
-### 2-2-1 Little endian machine: 
-* Store the integer 0xA1B2C3D4 in the following memory starting at memory location 0x1000102C. 
-* IMPORTANT: Memory locations increase from bottom to top and from left to right... 
-
-| BYTE ADDRESS	| Byte +0	| Byte +1	| Byte +2	| Byte +3 |
-|---------------|-----------|-----------|-----------|---------|
-| 0x10001034    |           |           |           |         |				
-| 0x10001030    |           |           |           |         |				
-| 0x1000102C    |           |           |           |         |				
-<br>
-### 2-2-2 Little endian machine: 
-* Store the null terminated string “Endian” in the following memory starting at memory location 0x1000102C. 
-* Memory locations increase from bottom to top and from left to right... 
-
-| BYTE ADDRESS	| Byte +0	| Byte +1	| Byte +2	| Byte +3 |
-|---------------|-----------|-----------|-----------|---------|
-| 0x10001034    |           |           |           |         |				
-| 0x10001030    |           |           |           |         |				
-| 0x1000102C    |           |           |           |         |				
-<br>
-### 2-2-3 Big endian machine: 
-* Store the integer 0xA1B2C3D4 in the following memory starting at memory location 0x1000102C. 
-* Memory locations increase from bottom to top and from left to right... 
-
-| BYTE ADDRESS	| Byte +0	| Byte +1	| Byte +2	| Byte +3 |
-|---------------|-----------|-----------|-----------|---------|
-| 0x10001034    |           |           |           |         |				
-| 0x10001030    |           |           |           |         |				
-| 0x1000102C    |           |           |           |         |				
-<br>
-### 2-2-4 Big endian machine: 
-* Store the null terminated string “Endian” in the following memory starting at memory location 0x1000102C. 
-* Memory locations increase from bottom to top and from left to right... 
-
-
-| BYTE ADDRESS	| Byte +0	| Byte +1	| Byte +2	| Byte +3 |
-|---------------|-----------|-----------|-----------|---------|
-| 0x10001034    |           |           |           |         |				
-| 0x10001030    |           |           |           |         |				
-| 0x1000102C    |           |           |           |         |
-
-# Exercise 2-3: Dissassembling MIPS 
-
-Dissasembly is the process of taking a machine code program that is listed using 32 bit hex value, and determining the corresponding MIPS assembly language instruction for the machine code program.
-
-#### Dissasembly Process
-```
-Translate each HEX instruction to a 32 bit binary value.
-Identify the OPCODE field of that instruction.
-Look at the binary value of the OPCODE
-
-if OPCODE is all zeros
-    You have an R-type instruction
-    For the R-type instruction look at the FUNCT field to determine the instruction
-else
-    You have a J or I type instruction
-
-Lookup the OPCODE (or FUNCT) in the Appendix of your book to determine instruction.
-
-Repeat the process for the other instructions.
-```
-
-#### Graphic of the Dissasembly Process
-![Translation Process](./translation.png)
-
-Consider the following program. Convert it from MIPS machine code to assembler using Appendix B of your textbook. 
-
-```
- ADDRESS   MACHINE CODE
-[0040002c] 20100000  
-[00400030] 2011000a
-[00400034] 02118020  
-[00400038] 2231ffff  
-[0040003c] 1e20fffe  
-```
-
-You should be aware that this code was assembled using QTSPIM, and thus, 
-* The immediate value of the last instruction is sign extended and shifted left two places. 
-* QTSPIM adds this value TO THE CURRENT PC (0040003c) and NOT to PC+4 (00400040) as our book describes. 
-* Thus, the target address of the last instruction will (in QTSPIM) be 00400034.  
-* This is how you should interpret this algorithm to work for this exercise. 
-* This unfortunately does not agree with the book which claims the offset should be added to (PC+4) and does not match with how the book's MIPS processor works. 
-
-### 2-3-1 Write the MIPS Assembly language for the above program below in the space provided:
-
-```mips
-# Put your mips assembly language code immediately after this line
-
+In this area discuss if your predictions matched reality. Did you predict correctly? What mistakes did you make (if any)?
 
 
 ```
 
 
+### Exercise MIPS_3-3 MIPS Running on BASYS 3
 
+This folder has a MIPS processor wired to the FPGA's 4, 7-segment displays.  The 7-segment displays shows the top 4 bytes of the machine code program that’s currently running. 
 
+•	This has a process that generates a very slow clock (around 1 or 2 secs)
+•	Every clock cycle the processor outputs the instruction HEX code to the LEDs.
+•	Switch 0 is the reset signal. If you switch it on, the program counter will reset to zero and the first instruction code will be displayed. Switch it off and the program will continue running.
+•	It also outputs selected bits to the single LEDs ( these can be changed and are helpful for debugging).
 
-### 2-3-1 Write code for a C++ program snippet (you don't need an entire C++ program, just the corresponding statements) that does exactly the same thing below in the space provided
+The actual program will eventully run out of instructions. If you wait long enough, it will cycle through all the 00000000 instructions and wrap back around and start at instruction 0 again.
 
-```cpp
-// Put your C++ code after this line:
+STEP 1: Load the bistream for the current program into the fpga.  Run the program and record the HEX codes here:
+
+STEP 2: Do the instruction HEX codes match those in the simulation? Why or Why not?
+
+STEP 3: Increse the clock speed by a factor of 4. To do this, identify the clock divider VHDL hardware that generates the clock signal for the mips processor. Change the output signal from this clock so that it quadruples the clock speed from its current value. Synthesize and verify that the program runs four times as fast. 
+
+STEP 5: Paste the code you modified to double the clock speed here:
+
+```vhdl
+
+-- Put your VHDL code that you modified here
 
 
 ```
