@@ -17,7 +17,7 @@
 set outputdir "./generated"
 
 # Set to project name
-set projectName "MIPS_3_INDIVIDUAL"
+set projectName "MIPS_3_GROUP"
 
 # Set to top level entity name - entity to be used by the board or set to "" if no top level board yet
 # note that vivado will automatically select a "top level module" for  you if you use "" here.
