@@ -9,7 +9,7 @@ entity datapath is  -- MIPS datapath
        memtoreg, pcsrc:   in  STD_LOGIC;
        alusrc, regdst:    in  STD_LOGIC;
        regwrite, jump:    in  STD_LOGIC;
-       alucontrol:        in  STD_LOGIC_VECTOR(2 downto 0);
+       alucontrol:        in  STD_LOGIC_VECTOR(3 downto 0);
        zero:              out STD_LOGIC;
        pc:                inout STD_LOGIC_VECTOR((width-1) downto 0);
        instr:             in  STD_LOGIC_VECTOR((width-1) downto 0);
@@ -22,7 +22,7 @@ architecture struct of datapath is
   -- The datapath needs an ALU component
   component alu generic(width: integer);
   port(a, b:       in  STD_LOGIC_VECTOR((width-1) downto 0);
-       alucontrol: in  STD_LOGIC_VECTOR(2 downto 0);
+       alucontrol: in  STD_LOGIC_VECTOR(3 downto 0);
        result:     inout STD_LOGIC_VECTOR((width-1) downto 0);
        zero:       out STD_LOGIC);
   end component;
