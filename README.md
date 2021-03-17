@@ -122,7 +122,7 @@ Generate a simulation waveform that shows that your group's test program is runn
   ```
   clk, reset, pcsrc, pc, branch, instr, srca, srcb, aluout, zero, writedata, memwrite, readdata 
   ```
-  ![MIPS 3 Waveform](img/Waveformss.PNG)
+  [MIPS 3 Waveform](img/Waveformss.PNG)
   Include these signlas in that **exact** order! Make sure all your waveforms are readable and show values in hexadecimal. Take enough screen shots of the simulation trace (as you did before) and include them in this document directly here to demonstrate that your code is working. Make sure the waveforms are readable:
 
   ### Simulation Waveform Images
