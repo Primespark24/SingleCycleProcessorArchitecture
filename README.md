@@ -39,7 +39,7 @@ As a group refresh your memory of this paper: https://collaboration.csc.ncsu.edu
 ## _Step 1:_ Modify the hardware design (if neccessary) to support the three new instructions XORI, BGTZ, and instruction of choice
 Modify the following schematic (if neccessary). This jpg was made from the ```schematic.pptx``` file located in this folder. If you need to modify it in order to support the instructions, you can edit this PowerPoint slide. Once you have modified the slide, you can export it as a jpg into this folder and save it over the existing ```schematic.jpg```. Your changes should then become apparent in this document.  I recommend drawing any new signal wires or components in a different color than black or blue.
 
-[MIPS 3 Schematic](Schematic.jpg)
+[MIPS 3 Schematic](Schematic.png)
 
 ## _Step 2:_ Control Unit Modifications
 
@@ -122,6 +122,7 @@ Generate a simulation waveform that shows that your group's test program is runn
   ```
   clk, reset, pcsrc, pc, branch, instr, srca, srcb, aluout, zero, writedata, memwrite, readdata 
   ```
+  [MIPS 3 Waveform](Waveformss.PNG)
   Include these signlas in that **exact** order! Make sure all your waveforms are readable and show values in hexadecimal. Take enough screen shots of the simulation trace (as you did before) and include them in this document directly here to demonstrate that your code is working. Make sure the waveforms are readable:
 
   ### Simulation Waveform Images
