@@ -31,7 +31,8 @@ begin
   with alucontrol(2 downto 0) select result <=
     a and b when "000",
     a or b  when "010",
-    a xor b when "001",
+    a xor b when "110",
+    a nor b when "001",
     sum     when "100",
     slt     when others;
 	

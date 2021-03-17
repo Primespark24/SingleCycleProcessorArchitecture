@@ -24,6 +24,7 @@ begin
       when "000010" => controls <= "0XXX0X1111"; -- J
       when "001110" => controls <= "1010000110"; -- XORI
       when "000111" => controls <= "0XXX110011"; -- BGTZ
+      -- when "001101" => controls <= "1010000100"; -- ORI
       when others   => controls <= "----------"; -- illegal op
     end case;
   end process;

@@ -22,6 +22,7 @@ begin
                          when "100100" => alucontrol <= "0000"; -- logical and (for and)
                          when "100101" => alucontrol <= "0010"; -- logical or (for or)
                          when "101010" => alucontrol <= "1111"; -- set on less (for slt)
+                         when "100111" => alucontrol <= "0001"; -- nor
                          when others   => alucontrol <= "----"; -- should never happen
                      end case;
     end case;
