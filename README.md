@@ -47,25 +47,25 @@ Modify the tables below for the ```main decoder``` and the ```ALU decoder```, as
 
 | **Instruction** | **Op[5:0]** | **RegWrite** | **RegDst** | **AluSrc** | **Branch** | **MemWrite** | **MemtoReg** | **ALUOp[1:0] **|** Jump** |
 | --------------- | ----------- | ------------ | ---------- | ---------- | ---------- | ------------ | ------------ | -------------- | -------- |
-| R-type          | 000000      | 1 | 1 | 0 | 0 | 0 | 0 | 10 | 0 |
-| lw              | 100011      | 1 | 0 | 1 | 0 | 0 | 1 | 00 | 0 |
-| sw              | 101011      | 0 | X | 1 | 0 | 1 | X | 00 | 0 |
-| beq             | 000100      | 0 | X | 0 | 1 | 0 | X | 01 | 0 |
-| addi            | 001000      | 1 | 0 | 1 | 0 | 0 | 0 | 00 | 0 |
-| j               | 000010      | 0 | X | X | X | 0 | X | XX | 1 |
-| xori            |             |   |   |   |   |   |   |    |   |
-| bgtz            |             |   |   |   |   |   |   |    |   |
+| R-type          | 000000      | 1            | 1          | 0          | 0          | 0            | 0            | 10             | 0        |
+| lw              | 100011      | 1            | 0          | 1          | 0          | 0            | 1            | 00             | 0        |
+| sw              | 101011      | 0            | X          | 1          | 0          | 1            | X            | 00             | 0        |
+| beq             | 000100      | 0            | X          | 0          | 1          | 0            | X            | 01             | 0        |
+| addi            | 001000      | 1            | 0          | 1          | 0          | 0            | 0            | 00             | 0        |
+| j               | 000010      | 0            | X          | X          | X          | 0            | X            | XX             | 1        |
+| xori            | 001110      | 1            | 0          | 1          | 0          | 0            | 0            | 110            | 0        |
+| bgtz            | 000111      | 0            | X          | X          | X          | 1            | 1            | 011            | 0        |
+| nor             | 000000      | 1            | 0          | 1          | 0          | 0            | 0            | 100            | 0        |
 
 You may or may not need to add extra ALUOp signals:
 
-| **ALUOp[1:0]**|** Meaning** |
+| **ALUOp[2:0]**|** Meaning** |
 | ------------- | ----------- |
-| 00            | Add         |
-| 01            | Subtract    |
-| 10            | Look at funct field |
-| 11            |             |
-|               |             |
-|               |             |
+| 00X           | Add         |
+| 101           | Addi        |
+| 010           | Sub         |
+| 110           | Xori        |
+| 011           | Bgtz        |
 
 ## _Step 3:_ Implement Changes in VHDL
 
@@ -82,6 +82,14 @@ Put the mips assemly language code for your program here (make sure it uses all 
    ```asm
     # test_3.s MIPS Assembly Language Test Program to Test 3 newly implemented instructions
 
+    main:
+      addi $2, $0, 2
+      addi $3, $0, 2
+      # Comment out line 6 to test bgtz
+      nor $2, $2, $3
+      bgtz $2, end
+      addi $3, $0, 3
+    end:xori $2, $3, 1 
    ```
 
 
@@ -92,7 +100,12 @@ Also, include the hexcode directly here:
 
   Hex Code for the test program
   ```
-
+  20020002
+  20030002
+  00431027
+  1c400001
+  20030003
+  38620001
   ```
 
   NOTE: You may if you wish use PCSpim to generate part of the machine code for ```memfile_3.dat``` from the file ```test_3.s```. Remember that QTSpim will NOT give you the correct machine code for any of the jump or branching statements in your program! 
