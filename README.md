@@ -9,11 +9,37 @@ The learning goals for the MIPS 3 group project are as follows:
 * Learn how to implement new instructions for the MIPS single cyle processor
 
 ### Grade Break Down
-| Part                               |   | Points  |
-|------------------------------------|---|---------|
-| MIPS_3 a - Add XORI, BGTZ and one more instruction of choice.       |   | 30 pts  |   
-| MIPS_3 b - Mini Presentation       |   | 20 pts  |    
-| Total                              |   | 50 pts  |
+| Part                                                          |     | Points |
+| ------------------------------------------------------------- | --- | ------ |
+| MIPS_3 a - Add XORI, BGTZ and one more instruction of choice. | 28  | 30 pts |
+| MIPS_3 b - Mini Presentation                                  | 18  | 20 pts |
+| Total                                                         | 46  | 50 pts |
+
+| MIPS_3 a - Add XORI, BGTZ and one more instruction of choice. |     | Points |
+| ------------------------------------------------------------- | --- | ------ |
+| Step 1                                                        |2    | 4 pts |
+| Step 2                                                        |4    | 4 pts |
+| Step 3                                                        |4    | 4 pts |
+| Step 4                                                        |4    | 4 pts |
+| Step 5                                                        |4    | 4 pts |
+| Step 6                                                        |5    | 5 pts |
+| Step 7                                                        |5    | 5 pts |
+| Total                                                         |28   |30 pts |
+
+| MIPS_2-4 b - Presentation        |   | Points  |
+|----------------------------------|---|---------|
+| Show diagram of changes          |3  |  5 pts  |
+| Neat assembly listing & comments |5  |  5 pts  |
+| VHDL Listing                     |5  |  5 pts  |
+| Discussion                       |5  |  5 pts  | 
+| Above and Beyond                 |5  |  0 pts  |
+| Total                            |18 | 20 pts  |
+
+## Feedback
+* Good Effort!
+* Good ideas for Xor / Nor improvements
+* I am confused by your Schematic and don’t understand why you highlighted the AluSrc mux on your diagram. This mux does not really have anything to do with the alu decoder (or ALUP) which is a part of the decoder.
+* The diagram says the processor’s opcode signal was changed to 3 bits. But, opcode is actually a 6 bit signal that’s a part of every instruction, if you had actually changed this your processor would not have worked. After investigating your history on whigit, I see that Rudy changed alucontrol to 3 bits (correctly). alucontrol is very different from opcode.
 
 # Introduction
 In this lab you will (as a group) expand the MIPS single-cycle processor design using VHDL. 
